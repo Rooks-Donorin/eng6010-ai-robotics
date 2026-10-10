@@ -42,6 +42,9 @@ I first made a normal virtual environment and ran `pip install -e .`. It failed 
 
 The cause was my Python version. My Ubuntu came with **Python 3.14**, but the SDK pins `cyclonedds==0.10.2`. On PyPI, that version only has prebuilt Linux packages (wheels) for Python 3.7 through 3.10. On 3.14, pip falls back to building it from source, which needs the CycloneDDS C library installed first. That's why it failed.
 
+![pip install error](images/q2_install_error.png)
+*The original install failing on Python 3.14 while trying to build `cyclonedds` from source.*
+
 **Fix:** instead of building CycloneDDS from source, I made a separate Python 3.10 environment just for this project using `uv`, which downloads the right Python version automatically:
 
 ```bash
@@ -66,7 +69,7 @@ python example/helloworld/subscriber.py   # terminal 2
 
 The subscriber printed `Subscribe success` with the messages from the publisher. This showed that the SDK and CycloneDDS were installed and working.
 
-> **TODO:** Add screenshot → save as `images/q2_helloworld.png`, then replace this line with `![helloworld](images/q2_helloworld.png)`
+> **TODO:** Re-run the two helloworld scripts (no dog needed), save a screenshot as `images/q2_helloworld.png`, and replace this line with `![helloworld](images/q2_helloworld.png)`
 
 ### 2.4 Connecting to the Go2 X over Ethernet
 
@@ -74,6 +77,12 @@ The Go2 lives on a fixed network: the robot is at `192.168.123.161`, and the PC 
 
 **Problem 2: Linux couldn't see the dog.**
 Windows had the right IP, but inside Ubuntu, `ip -4 addr` only showed one interface, `eth0`, with a `172.21.x.x` address. By default, WSL2 runs behind its own private virtual network (NAT), so Linux can't see the Ethernet port directly. The SDK also relies on DDS discovery, which uses multicast, and that doesn't pass through WSL's default NAT.
+
+![Windows Ethernet IP](images/q2_windows_ethernet_ip.png)
+*Windows side: the Ethernet adapter correctly set to `192.168.123.99`.*
+
+![WSL before mirrored mode](images/q2_wsl_before_mirrored.png)
+*Linux side before the fix: only a NAT address (`172.21.86.74`), and the `grep` for `192.168.123` finds nothing.*
 
 **Fix: WSL mirrored networking.** Mirrored mode makes Linux share Windows' network interfaces directly. In PowerShell:
 
@@ -95,6 +104,9 @@ After restarting WSL, `ip -4 addr` showed both of my real network adapters insid
 | `eth0` | `192.168.123.99/24` | Ethernet cable to the dog |
 | `eth1` | `10.80.88.197/20` | University Wi-Fi |
 
+![WSL after mirrored mode](images/q2_wsl_after_mirrored.png)
+*After switching to mirrored mode: Linux now sees the Ethernet port (`eth0`, `192.168.123.99`) and the Wi-Fi (`eth1`).*
+
 The ping to the dog worked:
 
 ```
@@ -103,7 +115,6 @@ $ ping -c 4 192.168.123.161
 rtt min/avg/max/mdev = 1.349/1.849/2.388/0.420 ms
 ```
 
-> **TODO:** Add screenshot → save as `images/q2_network.png`, then replace this line with `![network](images/q2_network.png)`
 
 ### 2.5 Checking that SDK data is coming from the dog
 
@@ -133,9 +144,15 @@ while True:
 **Problem 3: no data, because I used the wrong interface.**
 The first time, I ran it as `python check_dog.py eth1` and nothing printed. `eth1` is my Wi-Fi, not the cable to the dog. With **`eth0`**, data started streaming right away. The SDK binds DDS to the interface name you give it, so a wrong name fails silently instead of giving an error.
 
-> **TODO:** Add screenshot → save as `images/q2_check_dog.png`, then replace this line with `![check_dog](images/q2_check_dog.png)`
+![ping and wrong interface](images/q2_ping_and_wrong_interface.png)
+*The ping to the dog succeeds, but `check_dog.py eth1` (the Wi-Fi) just sits there with no data until I stop it.*
+
+> **TODO:** Next time I'm connected to the dog, run `python check_dog.py eth0` and save a screenshot of the streaming data as `images/q2_check_dog.png`. Then replace this line with `![check_dog](images/q2_check_dog.png)`
 
 **Note on the `wireless_controller` example.** I also tried `example/wireless_controller/wireless_controller.py`, and at first it showed nothing. Reading the code, I found that by default it imports the `unitree_hg` message types, which are for the humanoid robots (G1, H1-2). The Go2 uses the `unitree_go` message types. I uncommented the Go2 import lines and commented out the G1 ones. This was a good reminder that the SDK examples are shared across several robots, so you have to check which robot each one is set up for.
+
+![early debugging](images/q2_wireless_controller_debug.png)
+*Early debugging, before the networking fix: an `IndentationError` from my first edit to the imports, then the controller example listening on `eth0` with no data (WSL was still in NAT mode at this point), and `check_dog.py` crashing because I forgot to give it an interface name.*
 
 ### 2.6 Example 2 – Front camera image (`capture_image.py`)
 
@@ -151,7 +168,11 @@ ImageName: ./img.jpg
 
 The script asked the Go2's video service for one frame and saved it as `img.jpg`. The image shows the lab from the dog's point of view: desks, office chairs, and boxes on a concrete floor. The camera is clearly wide-angle, with some barrel distortion at the edges. I'm keeping this image as real data for Question 4.
 
-> **TODO:** Copy the dog's photo to `images/q2_front_camera.jpg`, then replace this line with `![front camera](images/q2_front_camera.jpg)`
+![capture_image and sport client](images/q2_capture_and_sport_client.png)
+*`capture_image.py` saving `img.jpg`, then the sport client starting (see 2.7).*
+
+![Go2 front camera image](images/q2_front_camera.png)
+*The image the Go2's front camera captured of the lab.*
 
 ### 2.7 Example 3 – Making the dog move (`go2_sport_client.py`)
 
@@ -159,7 +180,7 @@ The script asked the Go2's video service for one frame and saved it as `img.jpg`
 python example/go2/high_level/go2_sport_client.py eth0
 ```
 
-This example uses the `SportClient`, the high-level API that sends commands to Unitree's built-in locomotion controller. It gives a menu, and you type an ID or name for each command. The first time, I just pressed Enter at the prompt and got `No matching test option found`, because it needs an actual number.
+This example uses the `SportClient`, the high-level API that sends commands to Unitree's built-in locomotion controller. It gives a menu, and you type an ID or name for each command. The first time, I just pressed Enter at the prompt and got `No matching test option found`, because it needs an actual number (you can see this at the bottom of the screenshot in 2.6).
 
 The sequence I used:
 
@@ -172,7 +193,7 @@ The sequence I used:
 
 I avoided options 11 and 12 (flips) and option 0 (`Damp`). Damp drops motor stiffness, and the robot falls where it stands, so it shouldn't be used as a stop button.
 
-> **TODO:** Fill in the table, save a terminal screenshot as `images/q2_sport_client.png`, and add a link to the video (GitHub can't play large videos inline, so upload it to YouTube/Google Drive and link it, or keep it under 10 MB as `images/q2_dog_walk.mp4`).
+> **TODO:** Fill in the table, save a terminal screenshot of the commands as `images/q2_sport_client.png`, and add a link to the video (GitHub can't play large videos inline, so upload it to YouTube/Google Drive and link it, or keep it under 10 MB as `images/q2_dog_walk.mp4`).
 
 ### 2.8 What I learned from Question 2
 
