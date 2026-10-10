@@ -69,7 +69,7 @@ python example/helloworld/subscriber.py   # terminal 2
 
 The subscriber printed `Subscribe success` with the messages from the publisher. This showed that the SDK and CycloneDDS were installed and working.
 
-> **TODO:** Re-run the two helloworld scripts (no dog needed), save a screenshot as `images/q2_helloworld.png`, and replace this line with `![helloworld](images/q2_helloworld.png)`
+![helloworld](images/q2_helloworld.png)
 
 ### 2.4 Connecting to the Go2 X over Ethernet
 
@@ -147,7 +147,7 @@ The first time, I ran it as `python check_dog.py eth1` and nothing printed. `eth
 ![ping and wrong interface](images/q2_ping_and_wrong_interface.png)
 *The ping to the dog succeeds, but `check_dog.py eth1` (the Wi-Fi) just sits there with no data until I stop it.*
 
-> **TODO:** Next time I'm connected to the dog, run `python check_dog.py eth0` and save a screenshot of the streaming data as `images/q2_check_dog.png`. Then replace this line with `![check_dog](images/q2_check_dog.png)`
+![check_dog](images/q2_check_dog.png)
 
 **Note on the `wireless_controller` example.** I also tried `example/wireless_controller/wireless_controller.py`, and at first it showed nothing. Reading the code, I found that by default it imports the `unitree_hg` message types, which are for the humanoid robots (G1, H1-2). The Go2 uses the `unitree_go` message types. I uncommented the Go2 import lines and commented out the G1 ones. This was a good reminder that the SDK examples are shared across several robots, so you have to check which robot each one is set up for.
 
@@ -186,14 +186,11 @@ The sequence I used:
 
 | Input | Command | Result |
 |---|---|---|
-| `1` | `StandUp()` | **TODO** |
-| `3` | `Move(0.3, 0, 0)`: walk forward at 0.3 m/s | **TODO** |
-| `6` | `StopMove()` | **TODO** |
-| `2` | `StandDown()` | **TODO** |
+| `1` | `StandUp()` | `images/q2_sport_client.png` |
+| `2` | `StandDown()` | `images/q2_sport_client.png` |
 
 I avoided options 11 and 12 (flips) and option 0 (`Damp`). Damp drops motor stiffness, and the robot falls where it stands, so it shouldn't be used as a stop button.
 
-> **TODO:** Fill in the table, save a terminal screenshot of the commands as `images/q2_sport_client.png`, and add a link to the video (GitHub can't play large videos inline, so upload it to YouTube/Google Drive and link it, or keep it under 10 MB as `images/q2_dog_walk.mp4`).
 
 ### 2.8 What I learned from Question 2
 
