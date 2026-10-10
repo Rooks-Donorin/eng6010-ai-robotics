@@ -9,3 +9,8 @@ venv/
 .DS_Store
 Thumbs.db
 .vscode/
+
+# LaTeX build files
+*.aux
+*.log
+*.out

@@ -7,7 +7,7 @@ This repo holds my writing, notes, and code for the ENG 6010 First Test.
 
 | Question | Topic | Where to look | Status |
 |---|---|---|---|
-| 1 | Review paper: color space, Gaussian pyramid, optical flow, GrabCut, supervised learning | [`q1_review_paper/`](q1_review_paper/) | In progress |
+| 1 | Review paper: color space, Gaussian pyramid, optical flow, GrabCut, supervised learning | [`q1_review_paper/review_paper.pdf`](q1_review_paper/review_paper.pdf) | Done |
 | 2 | Getting the dog environment ready: Linux, SDK, three examples | [`TECHNICAL_NOTE.md` §2](TECHNICAL_NOTE.md#question-2--getting-the-dog-environment-ready), [`q2_sdk/`](q2_sdk/) | Done (screenshots being added) |
 | 3 | Getting familiar with the dog apps | [`TECHNICAL_NOTE.md` §3](TECHNICAL_NOTE.md#question-3--getting-familiar-with-dog-apps), [`q3_demos/`](q3_demos/) | Review done, demo in progress |
 | 4 | Dog data and simulation | [`TECHNICAL_NOTE.md` §4](TECHNICAL_NOTE.md#question-4--dog-data-and-simulation), [`q4_vision/`](q4_vision/) | Data plan + all five methods done; rl_gym simulation in progress |
